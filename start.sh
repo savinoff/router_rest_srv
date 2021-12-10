@@ -8,3 +8,7 @@ sleep 5
 
 echo mqttbkp_srv started with ps:
 ps | grep python
+
+echo TODO: change ps grepping to pgrep
+
+
