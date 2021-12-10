@@ -1,0 +1,13 @@
+/config.py
+/.idea/vcs.xml
+/views/index.tpl.bkp
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/rest_srv.iml
+/subscriber_log.txt
+/__pycache__/*
+/out.txt
+/out_log.txt
+/subscriber_log.txt
+/venv/*
