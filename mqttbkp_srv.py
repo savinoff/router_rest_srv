@@ -45,7 +45,7 @@ class MqttClient:
 
         result_list = []
         if not self.connected:
-            self.connected()
+            self.connect()
         for topic in topics:
             print(f'Subscribing to {topic}')
             subscribe_result = self.client.subscribe(topic)
