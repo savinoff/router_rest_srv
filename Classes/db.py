@@ -38,6 +38,14 @@ class DBase:
         c.close()
         return res
 
+    def getsensorvalues_json(self):
+        c = self.conn.cursor()
+        res = list(c.execute('SELECT * FROM sensor_values'))
+        c.close()
+        return res
+
+
+
     def create_db(self):
         if self.connected != 1:
             self.connect()
@@ -51,6 +59,8 @@ class DBase:
         print(f'Created table table sensor_values', res)
         self.conn.commit()
         return 0
+
+
 
 db = DBase(config.db_path)
 db.connect()

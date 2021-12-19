@@ -13,7 +13,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, message):
     message_res = "Received message: " + str(message.payload.decode('UTF-8')) + " on topic: " + message.topic + " QoS: " + str(message.qos)
-    print(message_res)
+    # print(message_res)
     with open('subscriber_log.txt', 'a') as out_file:
         out_file.write(f'{datetime.now()} {message_res}\n')
     topic_l = str(message.topic).split('/')

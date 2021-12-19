@@ -11,3 +11,4 @@
 /out_log.txt
 /subscriber_log.txt
 /venv/*
+/test.py
