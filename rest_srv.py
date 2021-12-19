@@ -9,11 +9,6 @@ import sqlite3
 
 ASSETS_JS_PATH = os.path.join('assets/js/')
 
-test_result = {'status': 'OK',
-               "val1": 123.22,
-               "val2": 456.01
-               }
-
 
 @route('/')
 def index_page():
@@ -27,7 +22,12 @@ def stat_files(filename):
 
 @route('/test')
 def test():
-    print(json.dumps(test_result, indent=2))
+    test_result = {'status': 'OK',
+                   "val1": 123.22,
+                   "val2": 456.01,
+                   "current_time": datetime.now().isoformat()
+                   }
+    # print(json.dumps(test_result, indent=2))
     return json.dumps(test_result)
 
 
@@ -86,4 +86,8 @@ def getrecs(sensor_key):
 
 
 if __name__ == '__main__':
-    run(host='localhost', port=3001)
+    if config.client_id.find('dev') > 0:
+        run(host='localhost', port=3001)
+    else:
+        run(host='192.168.7.1', port=8081)
+
