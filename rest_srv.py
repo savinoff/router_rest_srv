@@ -86,8 +86,5 @@ def getrecs(sensor_key):
 
 
 if __name__ == '__main__':
-    if config.client_id.find('dev') > 0:
-        run(host='localhost', port=3001)
-    else:
-        run(host='192.168.7.1', port=8081)
+    run(host=config.rest_srv_ip_addr, port=config.rest_srv_ip_port)
 
