@@ -10,6 +10,19 @@ import sqlite3
 ASSETS_JS_PATH = os.path.join('assets/js/')
 
 
+def dict_factory(cursor, row):
+    r = {}
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+
+conn = sqlite3.connect(config.db_path, timeout=15)
+conn.row_factory = dict_factory
+
+
+
 @route('/')
 def index_page():
     return template('index.html')
@@ -38,37 +51,28 @@ def index():
 
 @route('/getsensorvalues_json/<sensor_key>', method='GET')
 def getrecs(sensor_key):
-    def dict_factory(cursor, row):
-        r = {}
-        d = {}
-        for idx, col in enumerate(cursor.description):
-            d[col[0]] = row[idx]
-        return d
-
     mintimestamp = 0
     maxtimestamp = 0
     params = {}
-    conn = sqlite3.connect(config.db_path)
-    conn.row_factory = dict_factory
     c = conn.cursor()
     exec_str = """SELECT 
-                            round(timestamp/60/10, 0)*60*10 as timestamp, 
-                            (max(case  when sensor_key = 'temperature' then value else 0 end) 
-                                + max(case  when sensor_key = 'temperature' then value else 0 end))/2 as value_temp,
-                            (max(case  when sensor_key = 'humidity' then value else 0 end) 
-                                + max(case  when sensor_key = 'humidity' then value else 0 end))/2 as value_hum
-                        from sensor_values  
-                        where timestamp > :mintimestamp 
-                            and sensor_key in ('temperature', 'humidity')
-                        group by 
-                            round(timestamp/60/10, 0)
-                        order by timestamp
-                        """
+                        round(timestamp/60/10, 0)*60*10 as timestamp, 
+                        (max(case  when sensor_key = 'temperature' then value else 0 end) 
+                            + max(case  when sensor_key = 'temperature' then value else 0 end))/2 as value_temp,
+                        (max(case  when sensor_key = 'humidity' then value else 0 end) 
+                            + max(case  when sensor_key = 'humidity' then value else 0 end))/2 as value_hum
+                    from sensor_values  
+                    where timestamp > :mintimestamp 
+                        and sensor_key in ('temperature', 'humidity')
+                    group by 
+                        round(timestamp/60/10, 0)
+                    order by timestamp
+                    """
     mintimestamp = time.time() - 3600 * 24
     params = {"mintimestamp": mintimestamp}
     c.execute(exec_str, params)
     results = c.fetchall()
-    conn.close()
+    c.close()
     value_data_temp = []
     value_data_hum = []
     value_labels = []
@@ -87,4 +91,5 @@ def getrecs(sensor_key):
 
 if __name__ == '__main__':
     run(host=config.rest_srv_ip_addr, port=config.rest_srv_ip_port)
+    conn.close()
 
