@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Line Chart</title>
+	<script src="./assets/js/Chart.bundle.js"></script>
+	<script src="./assets/js/utils.js"></script>
+	<style>
+	canvas{
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+	</style>
+</head>
+
+<body>
+	<div style="width:95%;top:50%" >
+		<canvas id="canvas"></canvas>
+	</div>
+	<br>
+	<br>
+
+	<script>
+		myHomeTempURL = "./getsensorvalues_json/HomeTemp";
+		// var myHomeTempURL = "./getsensorvalues_json/HomeTemp";
+		// function Get(yourUrl){
+		//     var Httpreq = new XMLHttpRequest(); // a new request
+		//     Httpreq.open("GET",yourUrl,false);
+		//     Httpreq.send(null);
+		//     return Httpreq.responseText;          
+		// }
+
+		function checkStatus(response) {
+		  if (response.status >= 200 && response.status < 300) {
+		    return response
+		  } else {
+		    var error = new Error(response.statusText)
+		    error.response = response
+		    throw error
+		  }
+		}
+
+		function parseJSON(response) {
+		  return response.json()
+		}
+
+		var json_obj = fetch(myHomeTempURL)
+		  .then(checkStatus)
+		  .then(parseJSON)
+		  .then(function(data) {
+		    console.log('request succeeded with JSON response', data);
+		    return data;
+		  }).catch(function(error) {
+		    console.log('request failed', error)
+		  })
+
+
+
+
+		// var json_obj = JSON.parse(Get(myHomeTempURL));
+		var value_labels = json_obj.value_labels
+		var value_data_temp = json_obj.value_data_1;
+		var value_data_hum = json_obj.value_data_2;
+		console.log("Q"+json_obj.value_data_1);
+
+
+		//var value_data = [100, 200, 300, 200, 150, 100]
+		//var value_labels = ['1', '2', '3', '4', '5', '6', '7', '8']
+
+		var config = {
+			type: 'line',
+			data: {
+				labels: value_labels,
+				datasets: [{
+					label: 'HomeTemp',
+					backgroundColor: window.chartColors.red,
+					borderColor: window.chartColors.red,
+					data: value_data_temp,
+					fill: false,
+					yAxisID: 'y-axis-1',
+				}, {
+					label: 'HomeHum',
+					backgroundColor: window.chartColors.blue,
+					borderColor: window.chartColors.blue,
+					data: value_data_hum,
+					fill: false,
+					yAxisID: 'y-axis-2',
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Temp Hum Chart'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'tms'
+						}
+					}],
+					yAxes: [{
+						type: 'linear',
+						display: true,
+						position: 'right',
+						id: 'y-axis-1',
+						scaleLabel: {
+							display: true,
+							labelString: 'Temp, C'
+						}
+					}, {
+						type: 'linear',
+						display: true,
+						position: 'right',
+						id: 'y-axis-2',
+						scaleLabel: {
+							display: true,
+							labelString: 'Hum, %'
+						}
+					}]
+				}
+			}
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			console.log(config);
+			
+			
+			var json_obj = fetch(myHomeTempURL)
+			  .then(checkStatus)
+			  .then(parseJSON)
+			  .then(function(data) {
+			    console.log('request succeeded with JSON response', data);
+			    return data;
+			  }).catch(function(error) {
+			    console.log('request failed', error)
+			  }).then(function (json_obj){
+				config.data.datasets[0].data = json_obj.value_data_1;
+				config.data.datasets[1].data = json_obj.value_data_2;
+				config.data.labels = json_obj.value_labels;
+				window.myLine = new Chart(ctx, config);
+			  })
+			
+			
+		};
+
+		var colorNames = Object.keys(window.chartColors);
+
+	</script>
+</body>
+
+</html>
