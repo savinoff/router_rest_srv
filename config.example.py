@@ -8,7 +8,7 @@ class Config:
     port: int = 1883
     client_id: str = f'python-mqtt-999'
     topics: List[str] = field(default_factory=list)
-
+    db_path = 'db/sensors_values.db'
 
 config = Config()
 config.topics = ['devices/#',

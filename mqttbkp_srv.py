@@ -1,6 +1,7 @@
 from paho.mqtt import client as paho_mqtt_client
 from datetime import datetime
 from config import config
+from Classes.db import db
 
 
 def on_connect(client, userdata, flags, rc):
@@ -10,11 +11,22 @@ def on_connect(client, userdata, flags, rc):
         print("Failed to connect, return code %d\n", rc)
 
 
+def on_message(client, userdata, message):
+    message_res = "Received message: " + str(message.payload.decode('UTF-8')) + " on topic: " + message.topic + " QoS: " + str(message.qos)
+    print(message_res)
+    with open('subscriber_log.txt', 'a') as out_file:
+        out_file.write(f'{datetime.now()} {message_res}\n')
+    topic_l = str(message.topic).split('/')
+    if topic_l[0] == 'devices' and topic_l[2] == 'sensors':
+        device = topic_l[1]
+        sensor = topic_l[3]
+        value = float(message.payload.decode('UTF-8'))
+    db.add_sensor_value(device_key=device, sensor_key=sensor, value=value)
+
+
 class MqttClient:
     def __init__(self, config: config):
         """
-
-        :type port: object
         """
         self.config = config
         self.client: paho_mqtt_client = None
@@ -37,12 +49,6 @@ class MqttClient:
         self.client.connect(self.broker, self.port)
         
     def subscribe(self, topics: list) -> list:
-        def on_message(client, userdata, message):
-            message = "Received message: " + str(message.payload.decode('UTF-8')) + " on topic: " + message.topic + " QoS: " + str(message.qos)
-            print(message)
-            with open('subscriber_log.txt', 'a') as out_file:
-                out_file.write(f'{datetime.now()} {message}\n')
-
         result_list = []
         if not self.connected:
             self.connect()
@@ -66,17 +72,10 @@ class MqttClient:
     def loop(self):
         self.client.loop_forever(timeout=5.0)
 
-# def simple_callback(client, userdata, msg):
-#     print(f"simple_callback {client}; {userdata} Received `{msg.payload.decode()}` from `{msg.topic}` topic")
 
 if __name__ == '__main__':
     print(config)
-    # mqtt_client = MqttClient(config.broker, config.port, config.client_id)
     mqtt_client = MqttClient(config)
     mqtt_client.run_loop()
-    # mqtt_client.connect()
-    # mqtt_client.subscribe(config.topics)
-    # mqtt_client.client.message_callback_add('test/#', simple_callback)
-    # mqtt_client.loop()
     print(mqtt_client)
 

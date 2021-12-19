@@ -37,9 +37,7 @@ configure
     (venv) ~/applications/router_rest_srv # cp config.example.py config.py 
     (venv) ~/applications/router_rest_srv # vim config.py 
 
-    
-
 run service
 
-    (venv) ~/applications/router_rest_srv # ./start.sh
+    ~/applications/router_rest_srv # ./start.sh
 
