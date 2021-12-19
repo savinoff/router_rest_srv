@@ -21,6 +21,16 @@ def dict_factory(cursor, row):
 conn = sqlite3.connect(config.db_path, timeout=15)
 conn.row_factory = dict_factory
 
+def sql_execute(querry: str, params: dict = None):
+    cur = conn.cursor()
+    if not params:
+        cur.execute(querry)
+    else:
+        cur.execute(querry, params)
+    result = cur.fetchall()
+    cur.close()
+    return result
+
 
 
 @route('/')
@@ -47,6 +57,27 @@ def test():
 @route('/')
 def index():
     return template('index')
+
+
+@route('/get_last_sensor_value/<sensor_key>', method='GET')
+def get_last_sensor_value(sensor_key):
+    querry = """
+            select id, 
+                device_key, 
+                sensor_key, 
+                value, 
+                timestamp
+            from sensor_values
+            where device_key = :p_device_key
+                and sensor_key = :p_sensor_key
+            order by id desc
+            limit 1
+            """
+    params = {'p_device_key': 'esp8266_r01',
+              'p_sensor_key': sensor_key}
+    res = sql_execute(querry, params)
+    res_json = json.dumps(res, indent=2)
+    return res_json
 
 
 @route('/getsensorvalues_json/<sensor_key>', method='GET')
