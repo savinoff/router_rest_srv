@@ -17,7 +17,8 @@ def on_message(client, userdata, message):
     with open('subscriber_log.txt', 'a') as out_file:
         out_file.write(f'{datetime.now()} {message_res}\n')
     topic_l = str(message.topic).split('/')
-    if topic_l[0] == 'devices' and topic_l[2] == 'sensors':
+    device, sensor = None, None
+    if len(topic_l) > 3 and topic_l[0] == 'devices' and topic_l[2] == 'sensors':
         device = topic_l[1]
         sensor = topic_l[3]
         value = float(message.payload.decode('UTF-8'))
