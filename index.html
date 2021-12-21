@@ -21,15 +21,18 @@
 	<br>
 	<br>
 
+	<p>
+		<div>Temperature value, С:<div id="elem_temp">Not defined</div>
+		</div>
+		<br/>
+		<div>Humidity value,  &#37: <div id="elem_hum">Humidity</div>
+		</div>
+		
+	</p>
+
+
 	<script>
 		myHomeTempURL = "./getsensorvalues_json/HomeTemp";
-		// var myHomeTempURL = "./getsensorvalues_json/HomeTemp";
-		// function Get(yourUrl){
-		//     var Httpreq = new XMLHttpRequest(); // a new request
-		//     Httpreq.open("GET",yourUrl,false);
-		//     Httpreq.send(null);
-		//     return Httpreq.responseText;          
-		// }
 
 		function checkStatus(response) {
 		  if (response.status >= 200 && response.status < 300) {
@@ -55,18 +58,9 @@
 		    console.log('request failed', error)
 		  })
 
-
-
-
-		// var json_obj = JSON.parse(Get(myHomeTempURL));
 		var value_labels = json_obj.value_labels
 		var value_data_temp = json_obj.value_data_1;
 		var value_data_hum = json_obj.value_data_2;
-		console.log("Q"+json_obj.value_data_1);
-
-
-		//var value_data = [100, 200, 300, 200, 150, 100]
-		//var value_labels = ['1', '2', '3', '4', '5', '6', '7', '8']
 
 		var config = {
 			type: 'line',
@@ -133,16 +127,53 @@
 			}
 		};
 
+		let requestURL = './get_last_sensor_value/temperature';
+		let request = new XMLHttpRequest();
+		request.open('GET', requestURL);
+		request.responseType = 'text';
+		request.send();
+
+		function set_temp_value(jsonObj) {
+			var elem = document.getElementById('elem_temp');
+			console.log('exec set_temp_value');
+			elem.textContent = jsonObj[0]['value'];
+		}
+
+		request.onload = function() {
+			console.log('exec equest.onload');
+			const temp_json_text = request.response;
+			const temp_json = JSON.parse(temp_json_text);
+			set_temp_value(temp_json);
+		}
+
+		let requestURL_h = './get_last_sensor_value/humidity';
+		let request_h = new XMLHttpRequest();
+		request_h.open('GET', requestURL_h);
+		request_h.responseType = 'text';
+		request_h.send();
+
+		function set_hum_value(jsonObj) {
+			var elem = document.getElementById('elem_hum');
+			console.log('exec set_hum_value');
+			elem.textContent = jsonObj[0]['value'];
+		}
+
+		request_h.onload = function() {
+			console.log('exec equest_h.onload');
+			const hum_json_text = request_h.response;
+			const hum_json = JSON.parse(hum_json_text);
+			set_hum_value(hum_json);
+		}
+
 		window.onload = function() {
 			var ctx = document.getElementById('canvas').getContext('2d');
 			console.log(config);
-			
-			
+
 			var json_obj = fetch(myHomeTempURL)
 			  .then(checkStatus)
 			  .then(parseJSON)
 			  .then(function(data) {
-			    console.log('request succeeded with JSON response', data);
+			    console.log('request succeeded with JSON response 3', data);
 			    return data;
 			  }).catch(function(error) {
 			    console.log('request failed', error)
@@ -152,12 +183,9 @@
 				config.data.labels = json_obj.value_labels;
 				window.myLine = new Chart(ctx, config);
 			  })
-			
-			
 		};
 
 		var colorNames = Object.keys(window.chartColors);
-
 	</script>
 </body>
 
