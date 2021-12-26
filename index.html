@@ -16,7 +16,7 @@
 
 <body>
 	<div style="width:95%;top:50%" >
-		<canvas id="canvas"></canvas>
+		<canvas id="canvas">Loading canvas....</canvas>
 	</div>
 	<br>
 	<br>
@@ -182,7 +182,8 @@
 				config.data.datasets[1].data = json_obj.value_data_2;
 				config.data.labels = json_obj.value_labels;
 				window.myLine = new Chart(ctx, config);
-			  })
+			  });
+			ctx.textContent = '';
 		};
 
 		var colorNames = Object.keys(window.chartColors);

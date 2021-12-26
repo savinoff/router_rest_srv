@@ -22,7 +22,9 @@ def on_message(client, userdata, message):
         device = topic_l[1]
         sensor = topic_l[3]
         value = float(message.payload.decode('UTF-8'))
-    db.add_sensor_value(device_key=device, sensor_key=sensor, value=value)
+        db.add_sensor_value(device_key=device, sensor_key=sensor, value=value)
+    else:
+        print(f'{datetime.now()} {message_res}')
 
 
 class MqttClient:
