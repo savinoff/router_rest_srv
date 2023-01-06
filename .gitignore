@@ -12,3 +12,12 @@
 /subscriber_log.txt
 /venv/*
 /test.py
+/db/sensors_values.db
+/Classes/__pycache__/
+.DS_Store
+assets/.DS_Store
+assets/js/.DS_Store
+
+/certs/reg_cert.pem
+/certs/reg_key.pem
+/certs/rootCA.crt

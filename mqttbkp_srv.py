@@ -1,7 +1,8 @@
 from paho.mqtt import client as paho_mqtt_client
 from datetime import datetime
-from config import config
+from config import config, device_dict
 from Classes.db import db
+import ssl
 
 
 def on_connect(client, userdata, flags, rc):
@@ -18,10 +19,12 @@ def on_message(client, userdata, message):
         out_file.write(f'{datetime.now()} {message_res}\n')
     topic_l = str(message.topic).split('/')
     device, sensor = None, None
-    if len(topic_l) > 3 and topic_l[0] == 'devices' and topic_l[2] == 'sensors':
-        device = topic_l[1]
+    print(topic_l)
+    if len(topic_l) > 3 and topic_l[0] == '$devices' and topic_l[2] == 'state':
+        device = device_dict[topic_l[1]]
         sensor = topic_l[3]
         value = float(message.payload.decode('UTF-8'))
+        print(device, sensor, value)
         db.add_sensor_value(device_key=device, sensor_key=sensor, value=value)
     else:
         print(f'{datetime.now()} {message_res}')
@@ -47,9 +50,16 @@ class MqttClient:
                 print("Failed to connect, return code %d\n", rc)
         # Set Connecting Client ID
         self.client = paho_mqtt_client.Client(self.client_id)
-        # client.username_pw_set(username, password)
+        self.client.tls_set(ca_certs=self.config.ca_certs,
+                            certfile=self.config.certfile,
+                            keyfile=self.config.keyfile,
+                            tls_version=ssl.PROTOCOL_TLSv1_2,
+                            cert_reqs=ssl.CERT_REQUIRED,
+                            )
+        self.client.tls_insecure_set(True)
         self.client.on_connect = on_connect
-        self.client.connect(self.broker, self.port)
+        res = self.client.connect(self.broker, self.port)
+        print(res)
         
     def subscribe(self, topics: list) -> list:
         result_list = []
