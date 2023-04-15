@@ -5,15 +5,15 @@ from Classes.db import db
 import ssl
 
 
-def on_connect(client, userdata, flags, rc):
-    if rc == 0:
-        print("Connected to MQTT Broker!")
-    else:
-        print("Failed to connect, return code %d\n", rc)
-
-
+# def on_connect(client, userdata, flags, rc):
+#     if rc == 0:
+#         print(f'{datetime.now()} Connected to MQTT Broker! )')
+#     else:
+#         print("Failed to connect, return code %d\n", rc)
+#
+#
 def on_message(client, userdata, message):
-    message_res = "Received message: " + str(message.payload.decode('UTF-8')) + " on topic: " + message.topic + " QoS: " + str(message.qos)
+    message_res = f"{datetime.now()} Received message: " + str(message.payload.decode('UTF-8')) + " on topic: " + message.topic + " QoS: " + str(message.qos)
     # print(message_res)
     with open('subscriber_log.txt', 'a') as out_file:
         out_file.write(f'{datetime.now()} {message_res}\n')
@@ -24,7 +24,7 @@ def on_message(client, userdata, message):
         device = device_dict[topic_l[1]]
         sensor = topic_l[3]
         value = float(message.payload.decode('UTF-8'))
-        print(device, sensor, value)
+        print(f"{datetime.now()} {device}, {sensor}, {value}")
         db.add_sensor_value(device_key=device, sensor_key=sensor, value=value)
     else:
         print(f'{datetime.now()} {message_res}')
@@ -44,7 +44,7 @@ class MqttClient:
     def connect(self):
         def on_connect(client, userdata, flags, rc):
             if rc == 0:
-                print("Connected to MQTT Broker!")
+                print(f'{datetime.now()} Connected to MQTT Broker!')
                 self.connected = True
             else:
                 print("Failed to connect, return code %d\n", rc)
@@ -83,7 +83,7 @@ class MqttClient:
         self.loop()
 
     def loop(self):
-        self.client.loop_forever(timeout=5.0)
+        self.client.loop_forever(timeout=1.0)
 
 
 if __name__ == '__main__':
