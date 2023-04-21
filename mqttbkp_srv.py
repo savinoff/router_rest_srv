@@ -83,7 +83,7 @@ class MqttClient:
         self.loop()
 
     def loop(self):
-        self.client.loop_forever(timeout=1.0)
+        self.client.loop_forever(timeout=10.0)
 
 
 if __name__ == '__main__':
