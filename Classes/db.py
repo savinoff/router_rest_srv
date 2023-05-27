@@ -29,7 +29,7 @@ class DBase:
         new_id = c.lastrowid
         self.conn.commit()
         c.close()
-        print(f'added record id: {new_id}')
+        print(f'added record: {new_id=} {device_key=}, {sensor_key=}, {value=}, {timestamp=}')
         return 0
 
     def get_sensors_values(self):
@@ -43,8 +43,6 @@ class DBase:
         res = list(c.execute('SELECT * FROM sensor_values'))
         c.close()
         return res
-
-
 
     def create_db(self):
         if self.connected != 1:

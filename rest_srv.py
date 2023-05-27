@@ -6,9 +6,18 @@ from bottle import route, run, template, static_file
 import os
 from config import config
 import sqlite3
+from Classes.db import db
 
 ASSETS_JS_PATH = os.path.join('assets/js/')
+"""
+тестовые запросы:
+wget http://localhost:3001/add_sensor_value/test_device/humidity/90
+wget http://localhost:3001/add_sensor_value/test_device/temperature/20.5
+wget http://localhost:3001/add_sensor_value/test_device/temperature/tttt
+wget http://localhost:3001/add_sensor_value/test_device/temperature/20,5
 
+
+"""
 
 def dict_factory(cursor, row):
     r = {}
@@ -20,7 +29,6 @@ def dict_factory(cursor, row):
 
 conn = sqlite3.connect(config.db_path, timeout=15)
 conn.row_factory = dict_factory
-
 def sql_execute(querry: str, params: dict = None):
     cur = conn.cursor()
     if not params:
@@ -31,12 +39,17 @@ def sql_execute(querry: str, params: dict = None):
     cur.close()
     return result
 
-
-
 @route('/')
 def index_page():
     return template('index.html')
 
+@route('/add_sensor_value/<device_key>/<sensor_key>/<value>', method='GET')
+def add_sensor_value(device_key: str, sensor_key: str, value: float ):
+    try:
+        db.add_sensor_value(str(device_key), str(sensor_key), float(str(value).replace(',', '.')))
+    except Exception as e:
+        print(f'Error in writing sensor values to db {e}\nParameters: {device_key=} {sensor_key=} {value=}')
+    return 'OK'
 
 @route('/assets/js/<filename>')
 def stat_files(filename):
@@ -118,6 +131,8 @@ def getrecs(sensor_key):
     json_res['value_data_2'] = value_data_hum
     json_res['value_labels'] = value_labels
     return json.dumps(json_res)
+
+
 
 
 if __name__ == '__main__':
