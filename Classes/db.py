@@ -13,7 +13,7 @@ class DBase:
         self.connected = 1
         print('Connected OK')
 
-    def add_sensor_value(self, device_key: str, sensor_key: str, value: float, timestamp: int = None):
+    def add_sensor_value(self, device_key: str, sensor_key: str, value: float, timestamp: float = None):
         if self.connected != 1:
             self.connect()
         if not timestamp:
@@ -70,4 +70,3 @@ if __name__ == '__main__':
     # db.create_db()
     db.add_sensor_value('test_device', 'test_sensor', 15.0)
     db.get_sensors_values()
-
