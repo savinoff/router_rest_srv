@@ -1,0 +1,14 @@
+[Unit]
+Description=rest_srv
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=user
+WorkingDirectory=<путь_к_приложению>/router_rest_srv
+ExecStart=<путь_к_приложению>/router_rest_srv/venv/bin/python ./rest_srv.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
